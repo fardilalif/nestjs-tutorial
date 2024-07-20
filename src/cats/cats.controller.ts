@@ -24,11 +24,17 @@ import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
 export class CatsController {
   constructor(private catsService: CatsService) {}
 
+  // @Post()
+  // @UsePipes(new ZodValidationPipe(createCatSchema))
+  // @Roles(['admin'])
+  // async create(@Body() createCatDTO: CreateCatDTO) {
+  //   this.catsService.create(createCatDTO);
+  // }
+
   @Post()
-  @UsePipes(new ZodValidationPipe(createCatSchema))
-  @Roles(['admin'])
-  async create(@Body() createCatDTO: CreateCatDTO) {
-    this.catsService.create(createCatDTO);
+  async create(@Body('name') name: string) {
+    console.log(name);
+    this.catsService.createUser(name);
   }
 
   @Get()

@@ -1,0 +1,45 @@
+networks:
+  default:
+
+services:
+  mysql-db:
+    image: mysql
+    restart: always
+    env_file:
+      - ./.env
+    environment:
+      - MYSQL_ROOT_PASSWORD=$MYSQLDB_PASSWORD
+    ports:
+      - $MYSQLDB_LOCAL_PORT:$MYSQLDB_DOCKER_PORT
+    volumes:
+      - mysql-volume:/var/lib/mysql:rw
+      - ./mysql-script:/docker-entrypoint-initdb.d/
+    networks:
+      - default
+
+  api:
+    container_name: api
+    build: .
+    restart: always
+    depends_on:
+      - mysql-db
+    env_file:
+      - ./.env
+    ports:
+      - $API_LOCAL_PORT:$API_DOCKER_PORT
+    environment:
+      - DB_HOST=$MYSQLDB_HOST
+      - DB_USER=$MYSQLDB_USER
+      - DB_PASSWORD=$MYSQLDB_PASSWORD
+      - DB_DATABASE=$MYSQLDB_DATABASE
+      - DB_PORT=$MYSQLDB_DOCKER_PORT
+    stdin_open: true
+    tty: true
+    volumes:
+      - .:/app
+      - /app/node_modules
+    networks:
+      - default
+
+volumes:
+  mysql-volume:
